@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대시보드 | Hwaseon URL</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <style>
+    .user-info {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+      padding: 0 20px;
+    }
+    .user-name {
+      font-weight: bold;
+      color: #000000;
+      margin-right: 15px;
+    }
+    .logout-btn {
+      padding: 6px 12px;
+      background-color: #e53e3e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .admin-badge {
+      display: inline-block;
+      background-color: #000000;
+      color: white;
+      font-size: 12px;
+      padding: 3px 6px;
+      border-radius: 3px;
+      margin-right: 10px;
+    }
+    .admin-menu {
+      display: none; /* 기본적으로 숨김 */
+      margin-left: 20px;
+    }
+    .admin-link {
+      color: #000000;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .admin-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-header" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+      <div style="display: flex; align-items: center;">
+        <div class="header-icon">⚡</div>
+        <div class="header-text">대시보드</div>
+      </div>
+      
+      <div style="display: flex; align-items: center;">
+        <div class="user-info" style="margin-right: 20px;">
+          <span id="userIsAdmin" class="admin-badge" style="display: none;">관리자</span>
+          <span id="userName" class="user-name">로딩 중...</span>
+          <button id="logoutBtn" class="logout-btn">로그아웃</button>
+        </div>
+        
+        <a href="/" class="return-home" style="background-color: #12B886; color: white; padding: 8px 15px; border-radius: 5px; font-weight: bold; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2);" onmouseover="this.style.backgroundColor='#0ca678'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.3)';" onmouseout="this.style.backgroundColor='#12B886'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.2)';">IOPE URL 단축기</a>
+      </div>
+    </div>
+    <div class="dashboard-actions">
+      <button id="deleteAllBtn" class="delete-all-btn">전체 삭제</button>
+      <button id="downloadExcelBtn" class="download-excel-btn">엑셀 다운로드</button>
+      <button id="adminPageBtn" class="admin-page-btn" style="display: none;">계정관리</button>
+    </div>
+    <div class="dashboard-table-wrap">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th style="width: 5%; text-align: center;"></th>
+            <th style="width: 15%; text-align: center;">Short URL</th>
+            <th style="width: 30%; text-align: center;">Long URL</th>
+            <th style="width: 8%; text-align: center;">오늘 방문</th>
+            <th style="width: 8%; text-align: center;">누적 방문</th>
+            <th style="width: 10%; text-align: center;">사용자</th>
+
+            <th style="width: 16%; text-align: center;">메모</th> <!-- ✅ 추가 -->
+
+            <th style="width: 7%; text-align: center;">관리</th>
+            <th style="width: 7%; text-align: center;">상세</th>
+          </tr>
+        </thead>
+        <tbody id="dashboard-tbody">
+          <!-- JS로 데이터 렌더링 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="dashboard.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const userNameElement = document.getElementById('userName');
+      const userIsAdminElement = document.getElementById('userIsAdmin');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const adminPageBtn = document.getElementById('adminPageBtn'); // 계정관리 버튼
+      
+      // 사용자 정보 로드
+      fetch('/api/me', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
+      .then(response => {
+        console.log('API 응답 상태:', response.status);
+        if (!response.ok) {
+          throw new Error('Not authorized');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('사용자 정보:', data);
+        if (!data.success || !data.isAuthenticated) {
+          console.log('인증되지 않은 사용자, 로그인 페이지로 이동');
+          window.location.replace('/login');
+          return;
+        }
+        
+        userNameElement.textContent = data.user.username;
+        
+        // 관리자 표시
+        if (data.user.isAdmin) {
+          userIsAdminElement.style.display = 'inline-block';
+          adminPageBtn.style.display = 'inline-block';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        window.location.replace('/login');
+      });
+      
+      // 로그아웃 기능
+      logoutBtn.addEventListener('click', function() {
+        fetch('/api/logout', {
+          method: 'POST',
+          credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            window.location.replace('/login');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          window.location.replace('/login');
+        });
+      });
+      
+      // 계정관리 버튼 클릭 이벤트 - 관리자 페이지로 이동
+      if (adminPageBtn) {
+        adminPageBtn.addEventListener('click', function() {
+          window.location.href = '/admin';
+        });
+      }
+    });
+  </script>
+</body>
+</html> 

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>다중 URL 단축 | Hwaseon URL</title>
+    <link rel="stylesheet" href="multiple.css">
+    <style>
+        .file-upload-container {
+            margin-bottom: 20px;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        .file-upload-container p {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+        .file-input-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        #excelFile {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+        .file-label {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #000000;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .file-label:hover {
+            background-color: #000000;
+        }
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        #processExcelBtn {
+            display: block;
+            margin: 10px auto;
+            padding: 8px 15px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #processExcelBtn:hover {
+            background-color: #388e3c;
+        }
+        .or-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #666;
+        }
+        .or-divider::before, .or-divider::after {
+            content: "";
+            flex-grow: 1;
+            height: 1px;
+            background-color: #ddd;
+            margin: 0 15px;
+        }
+        /* 로그인 상태 스타일 */
+        .login-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .login-btn {
+            padding: 6px 12px;
+            background-color: #000000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .login-btn:hover {
+            background-color: #000000;
+        }
+        .logout-btn {
+            padding: 5px 10px;
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .user-name {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #000000;
+        }
+        .admin-badge {
+            display: inline-block;
+            background-color: #000000;
+            color: white;
+            font-size: 12px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 로그인 상태 표시 - 컨테이너 내부 우측 상단 -->
+        <div class="login-status" id="loginStatus" style="position: absolute; top: 15px; right: 15px;">
+            <a href="/login" class="login-btn" onclick="window.location.href='/login'; return false;">로그인</a>
+        </div>
+        
+        <h1>다중 URL 단축</h1>
+        <p class="subtitle">한 번에 여러 URL을 단축해보세요</p>
+        
+        <!-- 엑셀 파일 업로드 부분 -->
+        <div class="file-upload-container">
+            <p>엑셀 파일 업로드</p>
+            <div class="file-input-container">
+                <input type="file" id="excelFile" accept=".xlsx, .xls" />
+                <label for="excelFile" class="file-label">파일 선택</label>
+                <div class="file-name" id="fileName">선택된 파일 없음</div>
+            </div>
+            <button id="processExcelBtn">엑셀 처리하기</button>
+        </div>
+        
+        <div class="or-divider">또는</div>
+        
+        <div class="textarea-container">
+            <textarea id="longUrls" placeholder="URL을 줄바꿈으로 구분하여 입력하세요.&#10;예시:&#10;https://www.example.com&#10;https://www.google.com"></textarea>
+            <div class="button-group">
+                <button id="clearBtn">초기화</button>
+                <button id="shortenBtn">단축하기</button>
+            </div>
+        </div>
+        <div class="results" id="resultContainer">
+            <!-- 결과가 여기에 표시됩니다 -->   
+        </div>
+        <div class="bottom-nav">
+            <button onclick="window.location.href='/'" class="home-btn">단일 URL 단축</button>
+            <button type="button" id="dashboardBtn" class="dashboard-btn" style="margin-left: 10px;">대시보드</button>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // 로그인 상태 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            // 로그인 상태 가져오기
+            fetch('/api/me', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Cache-Control': 'no-cache'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // 로그인되지 않은 상태 유지
+                    return null;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.success && data.user) {
+                    // 로그인 된 경우 사용자 정보 표시
+                    const loginStatus = document.getElementById('loginStatus');
+                    
+                    let userHtml = '';
+                    // 관리자 표시
+                    if (data.user.isAdmin) {
+                        userHtml += '<span class="admin-badge">관리자</span>';
+                    }
+                    
+                    userHtml += `<span class="user-name">${data.user.username}</span>`;
+                    userHtml += '<button id="logoutBtn" class="logout-btn">로그아웃</button>';
+                    
+                    loginStatus.innerHTML = userHtml;
+                    
+                    // 로그아웃 이벤트 처리
+                    document.getElementById('logoutBtn').addEventListener('click', function() {
+                        fetch('/api/logout', {
+                            method: 'POST',
+                            credentials: 'include'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.reload();
+                            }
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error checking login status:', error);
+            });
+            
+            // 로그인 버튼 클릭 이벤트 직접 연결
+            const loginBtn = document.querySelector('.login-btn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = '/login';
+                });
+            }
+            
+            // 대시보드 버튼 클릭 이벤트
+            const dashboardBtn = document.getElementById('dashboardBtn');
+            dashboardBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // 로그인 상태 확인
+                fetch('/api/me', {
+                    credentials: 'include' // 세션 쿠키 포함
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 이미 로그인 된 경우 대시보드로 이동
+                        window.location.href = '/dashboard';
+                    } else {
+                        // 로그인 안된 경우 알림 메시지 표시
+                        showLoginRequiredModal();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking login status:', error);
+                    // 오류 발생 시에도 알림 메시지 표시
+                    showLoginRequiredModal();
+                });
+            });
+        });
+        
+        // 로그인 필요 알림 모달 표시
+        function showLoginRequiredModal() {
+            // 기존 모달이 있으면 제거
+            const existingModal = document.querySelector('.modal-overlay');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // 모달 생성
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content" style="width: 380px; text-align: center; padding: 30px 20px;">
+                    <div class="modal-header" style="margin-bottom: 15px;">
+                        <div class="modal-title" style="font-size: 20px; font-weight: bold; color: #000000;">로그인 필요</div>
+                    </div>
+                    <div style="margin: 20px 0; line-height: 1.6;">
+                        <p>대시보드 기능은 회원에 한하여 가능합니다.</p>
+                        <p>로그인 후, 만든 URL에 한해서 기능이 제공됩니다.</p>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 10px; margin-top: 25px;">
+                        <button class="modal-close-btn" style="background-color: #868e96; color: white; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer;">닫기</button>
+                    </div>
+                </div>
+            `;
+
+            // 모달 스타일
+            const style = document.createElement('style');
+            style.textContent = `
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                }
+                .modal-content {
+                    background-color: white;
+                    border-radius: 10px;
+                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+                }
+                .modal-close-btn:hover {
+                    opacity: 0.9;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // 이벤트 리스너 추가
+            document.body.appendChild(modal);
+            modal.querySelector('.modal-close-btn').addEventListener('click', function() {
+                modal.remove();
+            });
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+    </script>
+    <script src="multiple.js"></script>
+</body>
+</html> 

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 페이지 | Hwaseon URL</title>
+  <link rel="stylesheet" href="url.css" />
+  <style>
+    body {
+      background-color: #f5f8ff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    
+    .admin-container {
+      width: 100%;
+      max-width: 860px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .admin-header {
+      background-color: #4c6ef5;
+      color: white;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .admin-header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .dashboard-btn, .logout-btn {
+      padding: 0;
+      width: 100px;
+      height: 36px;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 14px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      margin: 0;
+    }
+    
+    .dashboard-btn {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .logout-btn {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .dashboard-btn:hover, .logout-btn:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .admin-tabs {
+      display: flex;
+      background-color: #f1f3f9;
+      border-bottom: 1px solid #e9ecef;
+      padding: 0 15px;
+    }
+    
+    .admin-tab {
+      padding: 16px 24px;
+      cursor: pointer;
+      font-weight: 500;
+      position: relative;
+      transition: all 0.2s ease;
+      font-size: 15px;
+      color: #666;
+    }
+    
+    .admin-tab:hover {
+      color: #4c6ef5;
+    }
+    
+    .admin-tab.active {
+      color: #4c6ef5;
+      font-weight: 600;
+    }
+    
+    .admin-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: #4c6ef5;
+      border-radius: 3px 3px 0 0;
+    }
+    
+    .tab-content {
+      display: block;
+      padding: 30px;
+    }
+    
+    .form-container {
+      background-color: #f8f9fa;
+      padding: 24px;
+      border-radius: 10px;
+      margin-bottom: 35px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+    }
+    
+    .form-container h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #444;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #495057;
+      font-size: 14px;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    
+    .form-group input:focus {
+      border-color: #4c6ef5;
+      box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.15);
+      outline: none;
+    }
+    
+    .submit-btn {
+      padding: 12px 20px;
+      background-color: #4c6ef5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .submit-btn:hover {
+      background-color: #3b5bdb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+    
+    h2 {
+      font-size: 20px;
+      margin: 0 0 20px 0;
+      color: #333;
+    }
+    
+    .users-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+    }
+    
+    .users-table th, .users-table td {
+      padding: 14px 16px;
+      text-align: left;
+    }
+    
+    .users-table th {
+      background-color: #f1f3f9;
+      font-weight: 600;
+      color: #495057;
+      font-size: 14px;
+    }
+    
+    .users-table tr:nth-child(even) {
+      background-color: #f8f9fc;
+    }
+    
+    .users-table tr:hover {
+      background-color: #f1f3f9;
+    }
+    
+    .users-table td {
+      border-bottom: 1px solid #edf2ff;
+    }
+    
+    .users-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .delete-btn {
+      padding: 8px 14px;
+      background-color: #e53e3e;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .delete-btn:hover {
+      background-color: #c53030;
+      transform: translateY(-1px);
+    }
+    
+    .success-message, .error-message {
+      padding: 12px;
+      margin: 15px 0;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 500;
+      font-size: 14px;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .error-message {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    #dashboardTab {
+      padding: 30px;
+      text-align: center;
+    }
+    
+    #dashboardTab p {
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    
+    #gotoDashboardBtn {
+      display: inline-block;
+      min-width: 180px;
+    }
+    .user-table-scroll {
+      max-height: 320px;
+      overflow-y: auto;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .user-table-scroll table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .user-table-scroll thead th {
+      position: sticky;
+      top: 0;
+      background: #f1f3f9;
+      z-index: 2;
+    }
+    .user-table-scroll tbody {
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>관리자 페이지</h1>
+      <div class="header-buttons">
+        <button id="dashboardBtn" class="dashboard-btn">대시보드</button>
+        <button id="logoutBtn" class="logout-btn">로그아웃</button>
+      </div>
+    </div>
+    
+    <!-- 사용자 관리 콘텐츠 -->
+    <div id="usersTab" class="tab-content active">
+      <div class="form-container">
+        <h2>새 사용자 등록</h2>
+        <div id="createUserMessage"></div>
+        <form id="createUserForm">
+          <div class="form-group">
+            <label for="newUsername">아이디</label>
+            <input type="text" id="newUsername" placeholder="사용자 아이디를 입력하세요" required>
+          </div>
+          <div class="form-group">
+            <label for="newPassword">비밀번호</label>
+            <input type="password" id="newPassword" placeholder="비밀번호를 입력하세요" required>
+          </div>
+          <button type="submit" class="submit-btn">사용자 생성</button>
+        </form>
+      </div>
+      
+      <h2>사용자 목록</h2>
+      <div class="user-table-scroll">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>아이디</th>
+              <th>생성일</th>
+              <th>관리자 권한</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <!-- 사용자 목록이 여기에 동적으로 추가됩니다 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 요소 가져오기
+      const createUserForm = document.getElementById('createUserForm');
+      const createUserMessage = document.getElementById('createUserMessage');
+      const usersTableBody = document.getElementById('usersTableBody');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const dashboardBtn = document.getElementById('dashboardBtn');
+      
+      // 관리자 로그인 확인
+      checkAdminAuth();
+      
+      // 사용자 목록 가져오기
+      loadUsers();
+      
+      // 인풋 포커스 효과
+      const inputs = document.querySelectorAll('input');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.classList.add('focused');
+        });
+        input.addEventListener('blur', function() {
+          this.parentElement.classList.remove('focused');
+        });
+      });
+      
+      // 대시보드 버튼
+      dashboardBtn.addEventListener('click', function() {
+        window.location.href = '/dashboard';
+      });
+      
+      // 로그아웃 버튼
+      logoutBtn.addEventListener('click', function() {
+        fetch('/api/logout', {
+          method: 'POST'
+        })
+        .then(() => {
+          window.location.href = '/login';
+        })
+        .catch(error => {
+          console.error('Logout error:', error);
+        });
+      });
+      
+      // 사용자 생성 폼 제출
+      createUserForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('newUsername').value.trim();
+        const password = document.getElementById('newPassword').value;
+        
+        if (!username || !password) {
+          showMessage(createUserMessage, '아이디와 비밀번호를 입력해주세요.', false);
+          return;
+        }
+        
+        // 사용자 생성 API 호출
+        fetch('/api/admin/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showMessage(createUserMessage, '사용자가 성공적으로 생성되었습니다.', true);
+            createUserForm.reset();
+            loadUsers(); // 사용자 목록 새로고침
+          } else {
+            showMessage(createUserMessage, data.message || '사용자 생성에 실패했습니다.', false);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showMessage(createUserMessage, '서버 오류가 발생했습니다.', false);
+        });
+      });
+      
+      // 관리자 인증 확인
+      function checkAdminAuth() {
+        fetch('/api/admin/auth')
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success || !data.isAdmin) {
+              // 관리자가 아니면 로그인 페이지로 리디렉션
+              window.location.href = '/login';
+            }
+          })
+          .catch(error => {
+            console.error('Auth check error:', error);
+            window.location.href = '/login';
+          });
+      }
+      
+      // 사용자 목록 불러오기
+      function loadUsers() {
+        fetch('/api/admin/users')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success && data.users) {
+              renderUsersTable(data.users);
+            } else {
+              console.error('Failed to load users:', data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error loading users:', error);
+          });
+      }
+      
+      // 사용자 목록 테이블 렌더링
+      function renderUsersTable(users) {
+        usersTableBody.innerHTML = '';
+        
+        users.forEach(user => {
+          const row = document.createElement('tr');
+          
+          const usernameCell = document.createElement('td');
+          usernameCell.textContent = user.username;
+          
+          const createdAtCell = document.createElement('td');
+          createdAtCell.textContent = new Date(user.createdAt).toLocaleDateString();
+          
+          const isAdminCell = document.createElement('td');
+          isAdminCell.textContent = user.isAdmin ? '관리자' : '일반사용자';
+          if (user.isAdmin) {
+            isAdminCell.style.fontWeight = 'bold';
+            isAdminCell.style.color = '#4c6ef5';
+          }
+          
+          const actionCell = document.createElement('td');
+          if (!user.isAdmin) { // 관리자 계정은 삭제 불가
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '삭제';
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.addEventListener('click', () => deleteUser(user.id, user.username));
+            actionCell.appendChild(deleteBtn);
+          }
+          
+          row.appendChild(usernameCell);
+          row.appendChild(createdAtCell);
+          row.appendChild(isAdminCell);
+          row.appendChild(actionCell);
+          
+          usersTableBody.appendChild(row);
+        });
+      }
+      
+      // 사용자 삭제
+      function deleteUser(userId, username) {
+        if (!confirm(`정말로 사용자 "${username}"을(를) 삭제하시겠습니까?`)) {
+          return;
+        }
+        
+        fetch(`/api/admin/users/${userId}`, {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            loadUsers(); // 사용자 목록 다시 불러오기
+          } else {
+            alert(data.message || '사용자 삭제에 실패했습니다.');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('서버 오류가 발생했습니다.');
+        });
+      }
+      
+      // 메시지 표시
+      function showMessage(element, message, isSuccess) {
+        element.textContent = message;
+        element.className = isSuccess ? 'success-message' : 'error-message';
+        
+        // 5초 후 메시지 숨기기
+        setTimeout(() => {
+          element.textContent = '';
+          element.className = '';
+        }, 5000);
+      }
+    });
+  </script>
+</body>
+</html> 

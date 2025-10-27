@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hwaseon URL 단축기</title>
+  <link rel="stylesheet" href="url.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- 로그인 상태 표시 -->
+    <div class="login-status" id="loginStatus">
+      <a href="/login" class="login-btn" onclick="window.location.href='/login'; return false;">로그인</a>
+    </div>
+    
+    <h1>IOPE URL 단축기</h1>
+    <div class="input-group">
+      <input type="text" id="longUrl" placeholder="긴 URL을 입력하세요" autocomplete="off" />
+      <button type="button" id="shortenBtn">단축</button>
+    </div>
+    <div class="result" id="resultBox" style="display: none;">
+      <span id="shortUrl"></span>
+      <button type="button" id="copyBtn">복사</button>
+    </div>
+    <div class="bottom-nav">
+      <button onclick="window.location.href='/multiple'" class="multiple-btn">다중 URL 단축</button>
+      <button type="button" id="dashboardBtn" class="dashboard-btn">대시보드</button>
+    </div>
+  </div>
+  <script>
+    // 로그인 상태 확인
+    document.addEventListener('DOMContentLoaded', function() {
+      // 로그인 상태 가져오기
+      fetch('/api/me', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          // 로그인되지 않은 상태 유지
+          return null;
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.success && data.user) {
+          // 로그인 된 경우 사용자 정보 표시
+          const loginStatus = document.getElementById('loginStatus');
+          
+          let userHtml = '';
+          // 관리자 표시
+          if (data.user.isAdmin) {
+            userHtml += '<span class="admin-badge">관리자</span>';
+          }
+          
+          userHtml += `<span class="user-name">${data.user.username}</span>`;
+          userHtml += '<button id="logoutBtn" class="logout-btn">로그아웃</button>';
+          
+          loginStatus.innerHTML = userHtml;
+          
+          // 로그아웃 이벤트 처리
+          document.getElementById('logoutBtn').addEventListener('click', function() {
+            fetch('/api/logout', {
+              method: 'POST',
+              credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                window.location.reload();
+              }
+            });
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error checking login status:', error);
+      });
+      
+      // 로그인 버튼 클릭 이벤트 직접 연결
+      const loginBtn = document.querySelector('.login-btn');
+      if (loginBtn) {
+        loginBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          window.location.href = '/login';
+        });
+      }
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

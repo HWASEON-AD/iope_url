@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로그인 | Hwaseon URL</title>
+  <link rel="stylesheet" href="url.css" />
+  <style>
+    body {
+      background-color: #f5f8ff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    .login-container {
+      width: 380px;
+      padding: 35px 40px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .login-container h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    .login-tabs {
+      display: flex;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e9ecef;
+    }
+    .login-tab {
+      flex: 1;
+      text-align: center;
+      padding: 14px 0;
+      cursor: pointer;
+      background-color: #f8f9fa;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .login-tab.active {
+      background-color: #000000;
+      color: white;
+      font-weight: 600;
+    }
+    .form-group {
+      margin-bottom: 22px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #495057;
+      font-size: 14px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus {
+      border-color: #000000;
+      box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.15);
+      outline: none;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #000000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.1s;
+      margin-top: 5px;
+    }
+    .login-btn:hover {
+      background-color: #000000;
+    }
+    .login-btn:active {
+      transform: scale(0.98);
+    }
+    .login-links {
+      margin-top: 25px;
+      text-align: center;
+    }
+    .login-links a {
+      color: #000000;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .login-links a:hover {
+      background-color: rgba(76, 110, 245, 0.1);
+    }
+    .error-message {
+      color: #e53e3e;
+      margin-top: 16px;
+      padding: 10px;
+      text-align: center;
+      display: none;
+      background-color: #fff5f5;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    #adminLoginForm, #userLoginForm {
+      display: none;
+    }
+    #adminLoginForm.active, #userLoginForm.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>로그인</h1>
+    
+    <div class="login-tabs">
+      <div class="login-tab active" id="userTab">사용자 로그인</div>
+      <div class="login-tab" id="adminTab">관리자 로그인</div>
+    </div>
+    
+    <!-- 사용자 로그인 폼 -->
+    <div id="userLoginForm" class="active">
+      <div class="form-group">
+        <label for="username">아이디</label>
+        <input type="text" id="username" placeholder="아이디를 입력하세요" autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" placeholder="비밀번호를 입력하세요" autocomplete="off" />
+      </div>
+      <button type="button" id="userLoginBtn" class="login-btn">로그인</button>
+    </div>
+    
+    <!-- 관리자 로그인 폼 -->
+    <div id="adminLoginForm">
+      <div class="form-group">
+        <label for="adminPassword">관리자 비밀번호</label>
+        <input type="password" id="adminPassword" placeholder="관리자 비밀번호를 입력하세요" autocomplete="off" />
+      </div>
+      <button type="button" id="adminLoginBtn" class="login-btn">관리자 로그인</button>
+    </div>
+    
+    <div id="errorMessage" class="error-message"></div>
+    <div class="login-links">
+      <a href="/">홈으로 돌아가기</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 로그인 탭 요소
+      const userTab = document.getElementById('userTab');
+      const adminTab = document.getElementById('adminTab');
+      const userLoginForm = document.getElementById('userLoginForm');
+      const adminLoginForm = document.getElementById('adminLoginForm');
+      
+      // 로그인 폼 요소
+      const userLoginBtn = document.getElementById('userLoginBtn');
+      const adminLoginBtn = document.getElementById('adminLoginBtn');
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const adminPasswordInput = document.getElementById('adminPassword');
+      const errorMessage = document.getElementById('errorMessage');
+      
+      // 인풋 포커스 효과
+      const inputs = document.querySelectorAll('input');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.classList.add('focused');
+        });
+        input.addEventListener('blur', function() {
+          this.parentElement.classList.remove('focused');
+        });
+      });
+      
+      // 탭 전환
+      userTab.addEventListener('click', function() {
+        userTab.classList.add('active');
+        adminTab.classList.remove('active');
+        userLoginForm.classList.add('active');
+        adminLoginForm.classList.remove('active');
+        errorMessage.style.display = 'none';
+      });
+      
+      adminTab.addEventListener('click', function() {
+        adminTab.classList.add('active');
+        userTab.classList.remove('active');
+        adminLoginForm.classList.add('active');
+        userLoginForm.classList.remove('active');
+        errorMessage.style.display = 'none';
+      });
+      
+      // 사용자 로그인 엔터 키
+      passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          userLogin();
+        }
+      });
+      
+      // 관리자 로그인 엔터 키
+      adminPasswordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          adminLogin();
+        }
+      });
+      
+      // 사용자 로그인 버튼 클릭
+      userLoginBtn.addEventListener('click', userLogin);
+      
+      // 관리자 로그인 버튼 클릭
+      adminLoginBtn.addEventListener('click', adminLogin);
+      
+      // 페이지 로드 시 첫 번째 입력칸에 포커스
+      if (userLoginForm.classList.contains('active')) {
+        usernameInput.focus();
+      } else {
+        adminPasswordInput.focus();
+      }
+      
+      // 사용자 로그인 함수
+      function userLogin() {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        
+        if (!username || !password) {
+          showError('아이디와 비밀번호를 모두 입력해주세요.');
+          return;
+        }
+        
+        // 로그인 버튼 비활성화 및 텍스트 변경
+        userLoginBtn.disabled = true;
+        userLoginBtn.textContent = '로그인 중...';
+        
+        // 로그인 API 호출
+        fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            username: username,
+            password: password
+          })
+        })
+        .then(response => {
+          console.log('로그인 응답 상태:', response.status);
+          return response.json();
+        })
+        .then(data => {
+          console.log('로그인 응답 데이터:', data);
+          if (data.success) {
+            console.log('로그인 성공, 리다이렉트 중...');
+            // 로그인 성공 시 즉시 리다이렉트
+            window.location.replace(data.redirectTo);
+          } else {
+            showError(data.message || '로그인에 실패했습니다.');
+            userLoginBtn.disabled = false;
+            userLoginBtn.textContent = '로그인';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          userLoginBtn.disabled = false;
+          userLoginBtn.textContent = '로그인';
+        });
+      }
+      
+      // 관리자 로그인 함수
+      function adminLogin() {
+        const adminPassword = adminPasswordInput.value;
+        
+        if (!adminPassword) {
+          showError('관리자 비밀번호를 입력해주세요.');
+          return;
+        }
+        
+        // 로그인 버튼 비활성화 및 텍스트 변경
+        adminLoginBtn.disabled = true;
+        adminLoginBtn.textContent = '로그인 중...';
+        
+        // 관리자 로그인 API 호출
+        fetch('/api/admin/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ password: adminPassword })
+        })
+        .then(response => {
+          console.log('관리자 로그인 응답 상태:', response.status);
+          return response.json();
+        })
+        .then(data => {
+          console.log('관리자 로그인 응답 데이터:', data);
+          if (data.success) {
+            console.log('관리자 로그인 성공, 리다이렉트 중...');
+            // 관리자 로그인 성공 시 즉시 리다이렉트
+            window.location.replace('/admin');
+          } else {
+            showError(data.message || '관리자 로그인에 실패했습니다.');
+            adminLoginBtn.disabled = false;
+            adminLoginBtn.textContent = '관리자 로그인';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+          adminLoginBtn.disabled = false;
+          adminLoginBtn.textContent = '관리자 로그인';
+        });
+      }
+      
+      // 에러 메시지 표시 함수
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        
+        // 애니메이션 효과
+        errorMessage.style.animation = 'none';
+        setTimeout(() => {
+          errorMessage.style.animation = 'shake 0.5s ease';
+        }, 10);
+      }
+    });
+    
+    // 에러 메시지 애니메이션
+    document.head.insertAdjacentHTML('beforeend', `
+      <style>
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+      </style>
+    `);
+  </script>
+</body>
+</html> 

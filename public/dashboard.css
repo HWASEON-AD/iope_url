@@ -1,0 +1,285 @@
+/* ========== Layout ========== */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* ========== Header ========== */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.header-icon {
+  font-size: 28px;
+  color: #000;
+}
+
+.header-text {
+  font-size: 28px;
+  font-weight: bold;
+  color: #000;
+}
+
+.header-subtitle {
+  margin-left: 12px;
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.header-subtitle:hover { color: #000; }
+
+/* ========== Info Card ========== */
+.dashboard-info {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 32px;
+  padding: 20px;
+  background: #f8faff;
+  border-radius: 10px;
+}
+.info-item {
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+.info-item:hover { transform: translateY(-2px); }
+.info-label { font-size: 16px; font-weight: bold; color: #000; }
+.info-value { font-size: 18px; color: #333; }
+.level-date { font-weight: 500; color: #000; }
+
+/* ========== Table ========== */
+.dashboard-table-wrap {
+  margin-top: 24px;
+  overflow-x: auto;
+  background: #f8faff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.dashboard-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 15px;
+  background: #f8faff;
+}
+.dashboard-table thead tr { background: #000; color: #fff; }
+.dashboard-table th,
+.dashboard-table td {
+  padding: 16px 8px;
+  text-align: center;
+}
+.dashboard-table td:nth-child(3) {
+  white-space: normal;
+  word-break: break-all;
+}
+.dashboard-table tr:hover { background: #f8f9fa; }
+
+/* Action Buttons */
+.dashboard-table .edit-btn,
+.dashboard-table .delete-btn,
+.dashboard-table .detail-btn {
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.edit-btn { background: #e3e8f0; color: #000; }
+.edit-btn:hover { background: #d0d8e8; transform: translateY(-1px); }
+.delete-btn { background: #dc3545; color: #fff; }
+.delete-btn:hover { background: #c82333; transform: translateY(-1px); }
+.detail-btn { background: #4CAF50; color: #fff; }
+.detail-btn:hover { background: #45a049; transform: translateY(-1px); }
+
+/* URL Link */
+.url-link {
+  color: #000;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.url-link:hover { text-decoration: underline; }
+
+/* Star */
+.star {
+  font-size: 18px;
+  color: #ffb300;
+  cursor: pointer;
+  margin-right: 4px;
+  transition: transform 0.2s;
+}
+.star:hover { transform: scale(1.1); }
+.star.inactive { color: #e0e0e0; }
+
+/* ========== Memo ========== */
+.memo-cell { text-align: left; white-space: nowrap; }
+.memo-line {
+  display: inline-block;
+  width: calc(100% - 18px);
+  height: 32px;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid #e6eaf2;
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+  vertical-align: middle;
+}
+.memo-line:focus { border-color: #cbd5e1; }
+
+.memo-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: middle;
+  background: #e2e8f0;
+}
+.memo-dot.saving { background: #f59e0b; }
+.memo-dot.saved  { background: #10b981; }
+.memo-dot.error  { background: #ef4444; }
+
+/* ========== Buttons (상단) ========== */
+.dashboard-actions { margin: 1rem 0; text-align: right; }
+.delete-all-btn,
+.download-excel-btn,
+.admin-page-btn,
+.return-home,
+.refresh-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.delete-all-btn { background: #e74c3c; color: #fff; }
+.delete-all-btn:hover { background: #c0392b; }
+.download-excel-btn { background: #000; color: #fff; margin-left: 10px; }
+.download-excel-btn:hover { background: #000; }
+.admin-page-btn { background: #000; color: #fff; margin-left: 10px; }
+.admin-page-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.return-home { background: #e3e8f0; color: #000; }
+.return-home:hover { background: #d0d8e8; transform: translateY(-1px); }
+.refresh-btn { background: #e3e8f0; color: #000; display: flex; align-items: center; gap: 8px; }
+.refresh-btn:hover { background: #d0d8e8; transform: translateY(-1px); }
+
+/* ========== User Badge ========== */
+.user-badge {
+  display: inline-block;
+  min-width: 80px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  background: #000;
+  color: #fff;
+  border-radius: 12px;
+}
+
+/* ========== Modal ========== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+.modal-content {
+  width: 100%;
+  max-width: 600px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+.modal-title { font-size: 20px; font-weight: bold; color: #000; }
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
+
+/* ========== Detail Grid ========== */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.detail-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: #f8faff;
+  border-radius: 8px;
+}
+.detail-label { width: 140px; font-size: 15px; color: #666; }
+.detail-value { flex: 1; font-size: 15px; font-weight: 500; }
+.detail-value.highlight { font-weight: bold; color: #000; }
+
+/* ========== Misc ========== */
+.copy-notification {
+  position: fixed;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  font-size: 14px;
+  background: #000;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  animation: slideUp 0.3s ease-out;
+  z-index: 1000;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translate(-50%,20px); }
+  to   { opacity: 1; transform: translate(-50%,0); }
+}
+
+/* Row Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dashboard-table tbody tr { animation: fadeIn 0.3s ease-out; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .dashboard-container { margin: 20px; padding: 20px; }
+  .dashboard-info { flex-wrap: wrap; gap: 20px; }
+  .info-item { flex: 1 1 calc(50% - 20px); min-width: 200px; }
+}
+@media (max-width: 768px) {
+  .dashboard-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .header-text { font-size: 24px; }
+  .dashboard-info { flex-direction: column; }
+  .info-item { width: 100%; }
+  .dashboard-table { font-size: 14px; }
+  .dashboard-table th, .dashboard-table td { padding: 12px 8px; }
+  .edit-btn, .delete-btn, .detail-btn { padding: 6px 12px; font-size: 12px; }
+}
