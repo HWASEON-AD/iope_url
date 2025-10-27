@@ -15,14 +15,12 @@ const PORT = process.env.PORT || 5001;
 /** =========================
  *  Persistent Disk 경로 (Render 퍼시스턴트 디스크)
  *  ========================= */
-const DATA_DIR = path.join('/tmp', 'data'); // ✅ Render 무료환경에서도 가능
-
-const DB_FILE = path.join(DATA_DIR, 'db.json');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
+// 변경 후
+const DATA_DIR = path.join('/tmp', 'data');
 const SESSIONS_DIR = path.join(DATA_DIR, 'sessions');
 const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
 
-// ✅ 이제 /tmp 이하에 자유롭게 생성 가능
+// 하위 폴더만 생성
 for (const dir of [DATA_DIR, SESSIONS_DIR, BACKUPS_DIR]) {
   try {
     fs.mkdirSync(dir, { recursive: true });
@@ -30,6 +28,7 @@ for (const dir of [DATA_DIR, SESSIONS_DIR, BACKUPS_DIR]) {
     console.error('[mkdir failed]', dir, e);
   }
 }
+
 
 /** =========================
  *  보안/관리자 설정
